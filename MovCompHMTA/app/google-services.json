@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "804137622188",
+    "project_id": "movcomp-hmta",
+    "storage_bucket": "movcomp-hmta.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:804137622188:android:0ae971e643fc1918b51d09",
+        "android_client_info": {
+          "package_name": "com.example.movcomphmta"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "804137622188-qum9d22j6dofqtp12hnpr606ljedbmjc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5drGSGU_wsY8b7FCRSXK01bEDrvWh1Is"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "804137622188-qum9d22j6dofqtp12hnpr606ljedbmjc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
