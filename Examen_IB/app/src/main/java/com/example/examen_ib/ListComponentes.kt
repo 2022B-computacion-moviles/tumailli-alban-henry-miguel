@@ -1,10 +1,17 @@
 package com.example.examen_ib
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.content.DialogInterface
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.ContextMenu
+import android.view.MenuItem
+import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.Calendar
@@ -13,11 +20,15 @@ class ListComponentes : AppCompatActivity() {
     var jsonArray: JSONArray = JSONArray()
     val componentes: ArrayList<Componente> = arrayListOf<Componente>()
     var idItemSeleccionado = 0
+    var compuId = -1
+    var componenteEditar = -1
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list_componentes)
         val computadorId =intent.getIntExtra("id",-1)
+        compuId = computadorId
 
         val c = Calendar.getInstance()
         val year = c.get(Calendar.YEAR)
@@ -33,6 +44,11 @@ class ListComponentes : AppCompatActivity() {
         val marca = findViewById<EditText>(R.id.tf_componente_marca)
         val si = findViewById<RadioButton>(R.id.rb_si)
         val no = findViewById<RadioButton>(R.id.rb_no)
+        val computador = findViewById<TextView>(R.id.tv_computador)
+
+        val lector:LeerFichero = LeerFichero(applicationContext)
+        val jsonArray: JSONArray = JSONArray(lector.leer())
+        computador.setText(jsonArray.getJSONObject(computadorId).get("nombre").toString())
 
         botonFecha.setOnClickListener{
             val dpd = DatePickerDialog(this,DatePickerDialog.OnDateSetListener{ _:DatePicker, mYear:Int, mMonth:Int, mDay:Int->
@@ -48,7 +64,6 @@ class ListComponentes : AppCompatActivity() {
             this,
             android.R.layout.simple_list_item_1,
             componentes
-
         )
 
         listView.adapter = adaptador
@@ -58,10 +73,14 @@ class ListComponentes : AppCompatActivity() {
         val botonAddComponente = findViewById<Button>(R.id.btn_componente_guardar)
         botonAddComponente
             .setOnClickListener{
-                crearComponente(computadorId,nombre,precio,fecha,marca,si,no,-1)
+                crearComponente(computadorId,nombre,precio,fecha,marca,si,no)
             }
 
-
+        val botonComputadores = findViewById<Button>(R.id.btn_computadores)
+        botonComputadores
+            .setOnClickListener{
+               abrirActividad(MainActivity::class.java)
+            }
     }
 
     fun crearComponente(
@@ -71,15 +90,10 @@ class ListComponentes : AppCompatActivity() {
         fecha:EditText,
         marca:EditText,
         si:RadioButton,
-        no:RadioButton,
-        id: Int
+        no:RadioButton
     ){
         val lector:LeerFichero = LeerFichero(applicationContext)
         val jsonArray: JSONArray = JSONArray(lector.leer())
-        val seleccionado = jsonArray.getJSONObject(computadorId)
-        val arregloComponentes = seleccionado.getJSONArray("componentes")
-
-        println("Componentes $arregloComponentes")
 
         val jsonObject:JSONObject= JSONObject()
 
@@ -93,22 +107,101 @@ class ListComponentes : AppCompatActivity() {
         else if(si.isChecked)
             jsonObject.put("nuevo",true)
 
-        if(id>=0){
-
-            jsonArray.getJSONObject(computadorId).getJSONArray("componentes").put(id,jsonObject)
+        if(componenteEditar>=0){
+            jsonArray.getJSONObject(computadorId).getJSONArray("componentes").put(componenteEditar,jsonObject)
         }
         else{
-            //println("Objeto $jsonObject")
-            //arregloComponentes.put(jsonObject)
-            //println("Componentes $arregloComponentes")
             jsonArray.getJSONObject(computadorId).getJSONArray("componentes").put(jsonObject)
         }
-
-        Log.i("Componentes reemplazo", jsonArray.toString())
 
         val escritor= GuardarFichero(applicationContext,jsonArray.toString())
         escritor.escribir()
         Log.i("A Guardar", jsonArray.toString())
+        abrirActividadConParametos(ListComponentes::class.java,compuId)
+    }
+
+    fun editar(
+        id:Int
+    ){
+        val lector:LeerFichero = LeerFichero(applicationContext)
+        val jsonArray: JSONArray = JSONArray(lector.leer())
+
+        var objeto = jsonArray.getJSONObject(compuId).getJSONArray("componentes").getJSONObject(id)
+        val nombre = findViewById<EditText>(R.id.tf_componente_nombre)
+        val precio = findViewById<EditText>(R.id.tf_componente_precio)
+        val fecha = findViewById<EditText>(R.id.tf_componente_fecha)
+        val marca = findViewById<EditText>(R.id.tf_componente_marca)
+        val si = findViewById<RadioButton>(R.id.rb_si)
+        val no = findViewById<RadioButton>(R.id.rb_no)
+        nombre.setText(objeto.get("nombre").toString())
+        precio.setText(objeto.get("precio").toString())
+        marca.setText(objeto.get("marca").toString())
+        fecha.setText(objeto.get("fecha").toString())
+        if(objeto.get("nuevo") as Boolean)
+            si.setChecked(true)
+        else
+            no.setChecked(true)
+
+        componenteEditar = id
+
+    }
+
+    override fun onCreateContextMenu(
+        menu: ContextMenu?,
+        v: View?,
+        menuInfo: ContextMenu.ContextMenuInfo?
+    ) {
+        super.onCreateContextMenu(menu, v, menuInfo)
+        //Lenamos las opciones del menu
+        val inflater = menuInflater
+        inflater.inflate(R.menu.menu_componente,menu)
+        //Obtener el id del ArrayListSeleccionado
+        val info = menuInfo as AdapterView.AdapterContextMenuInfo
+        val id = info.position
+        idItemSeleccionado = id
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId){
+            R.id.mi_comp_editar->{
+                "${idItemSeleccionado}"
+                editar(idItemSeleccionado)
+                Log.i("Seleccionado", idItemSeleccionado.toString())
+                return true
+            }
+            R.id.mi_comp_eliminar->{
+                abrirDialogo(idItemSeleccionado)
+                "${idItemSeleccionado}"
+                return true
+            }
+            else -> super.onContextItemSelected(item)
+        }
+    }
+
+    fun abrirDialogo(id :Int){
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("¿Está seguro que quiere eliminar este elemento?")
+        builder.setPositiveButton(
+            "Aceptar",
+            DialogInterface.OnClickListener{
+                    dialog,
+                    which->
+                val lector:LeerFichero = LeerFichero(applicationContext)
+                jsonArray = JSONArray(lector.leer())
+                jsonArray.getJSONObject(compuId).getJSONArray("componentes").remove(id)
+                val escritor= GuardarFichero(applicationContext,jsonArray.toString())
+                escritor.escribir()
+                abrirActividadConParametos(ListComponentes::class.java,compuId)
+            }
+        )
+
+        builder.setNegativeButton(
+            "Cancelar",
+            null
+        )
+
+        val dialogo = builder.create()
+        dialogo.show()
     }
 
     fun leerFichero(
@@ -130,5 +223,21 @@ class ListComponentes : AppCompatActivity() {
                 )
             )
         }
+    }
+
+    private fun abrirActividad(
+        clase: Class<*>,
+    ) {
+        val i = Intent(this, clase)
+        startActivity(i);
+    }
+
+    fun abrirActividadConParametos(
+        clase: Class<*>,
+        id: Int
+    ){
+        val intentExplicito = Intent(this,clase)
+        intentExplicito.putExtra("id",id)
+        startActivity(intentExplicito);
     }
 }
