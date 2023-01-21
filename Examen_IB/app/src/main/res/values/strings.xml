@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Examen_IB</string>
+
+    <color name="color_titulo_main">#2EB629</color>
+
+    <color name="color_titulo_componentes">#9C27B0</color>
+</resources>

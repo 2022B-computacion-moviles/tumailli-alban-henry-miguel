@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="texto_1">TEXT 1 LAND English</string>
+    <color name="color_texto_1">#3F51B5</color>
+    <color name="background_texto_1">#FF5722</color>
+</resources>

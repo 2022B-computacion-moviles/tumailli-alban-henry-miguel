@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="texto_3">TEXTO 3 LAND Español</string>
+    <color name="color_texto_3">#E91E63</color>
+    <color name="background_texto_3">#FFEB3B</color>
+</resources>

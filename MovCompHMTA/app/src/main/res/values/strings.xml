@@ -1,3 +1,39 @@
 <resources>
     <string name="app_name">MovCompHMTA</string>
+
+    <string name="hola_mundo">Hola Mundo</string>
+    <color name="color_hola_mundo">#FFBB86FC</color>
+
+    <string name="texto_1">TEXT 1</string>
+    <color name="color_texto_1">#FFBB86FC</color>
+    <color name="background_texto_1">#CCCC</color>
+
+    <string name="texto_2">TEXTO 2</string>
+    <color name="color_texto_2">#FFBB86FC</color>
+    <color name="background_texto_2">#CCCC</color>
+
+
+    <string name="texto_3">TEXT 3</string>
+    <color name="color_texto_3">#FFBB86FC</color>
+    <color name="background_texto_3">#FFBB86FC</color>
+
+    <string name="texto_4">TEXTO 4</string>
+    <color name="color_texto_4">#FFBB86FC</color>
+    <color name="background_texto_4">#CCCC</color>
+    <string name="title_activity_acliclo_vida">AClicloVida</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+
+    <string-array name="string_array_opciones_dialogo">
+        <item>Lunes</item>
+        <item>Martes</item>
+        <item>Miercoles</item>
+    </string-array>
 </resources>
