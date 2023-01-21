@@ -56,15 +56,21 @@ class CrearComputador : AppCompatActivity() {
         jsonObject.put("precio",precio.text)
         jsonObject.put("stock",stock.text)
         jsonObject.put("marca",marca.text)
+
         if(no.isChecked)
             jsonObject.put("nuevo",false)
         else if(si.isChecked)
             jsonObject.put("nuevo",true)
 
-        if(id>=0)
+        if(id>=0){
+            jsonObject.put("componentes", JSONArray()) //////////// Cambiar
             jsonArray.put(id,jsonObject)
-        else
+        }
+
+        else{
+            jsonObject.put("componentes", JSONArray())
             jsonArray.put(jsonObject)
+        }
 
         val escritor= GuardarFichero(applicationContext,jsonArray.toString())
         escritor.escribir()

@@ -93,8 +93,8 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
             R.id.mi_componentes->{
-                //Abrir ventana de componentes***************************************************/
                 "${idItemSeleccionado}"
+                abrirActividadConParametos(ListComponentes::class.java,idItemSeleccionado)
                 return true
             }
             else -> super.onContextItemSelected(item)
@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity() {
                     jsonArray.remove(id)
                     val escritor= GuardarFichero(applicationContext,jsonArray.toString())
                     escritor.escribir()
-                    reiniciarActividad(MainActivity::class.java)
+                    abrirActividad(MainActivity::class.java)
             }
         )
 
@@ -153,7 +153,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun reiniciarActividad(
+    private fun abrirActividad(
         clase: Class<*>,
     ) {
         val i = Intent(this, clase)

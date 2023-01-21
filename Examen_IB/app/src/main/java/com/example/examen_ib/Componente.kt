@@ -1,11 +1,9 @@
 package com.example.examen_ib
 
-import java.util.Date
-
 class Componente(
     var nombre:String,
     var precio:Float,
-    var fechaFabricacion: Date,
+    var fechaFabricacion: String,
     var marca:String,
     var nuevo:Boolean
 
