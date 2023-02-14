@@ -21,17 +21,6 @@ class MainActivity : AppCompatActivity() {
     var computadoras: ArrayList<Computador> = arrayListOf<Computador>()
     var idItemSeleccionado = 0
 
-    val contenidoIntenetExplicito=
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result ->
-            if(result.resultCode == Activity.RESULT_OK){
-                if(result.data != null){
-                    val data = result.data
-                    Log.i("intent-epn","${data?.getStringExtra("nombreModificado")}")
-                }
-            }
-        }
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -70,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         //Obtener el id del ArrayListSeleccionado
         val info = menuInfo as AdapterView.AdapterContextMenuInfo
         val id = info.position
-        idItemSeleccionado = id+1
+        idItemSeleccionado = computadoras[id].id
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
@@ -124,7 +113,7 @@ class MainActivity : AppCompatActivity() {
     ){
         val intentExplicito = Intent(this,clase)
         intentExplicito.putExtra("id",id)
-        contenidoIntenetExplicito.launch(intentExplicito)
+        startActivity(intentExplicito);
     }
 
     private fun abrirActividad(

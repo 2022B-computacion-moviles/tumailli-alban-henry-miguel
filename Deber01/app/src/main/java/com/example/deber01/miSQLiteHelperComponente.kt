@@ -6,17 +6,18 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 
-class miSQLiteHelper(context: Context) : SQLiteOpenHelper(
-    context, "deber", null, 4) {
+class miSQLiteHelperComponente(context: Context) : SQLiteOpenHelper(
+    context, "deberComponente", null, 4) {
 
     override fun onCreate(db: SQLiteDatabase?) {
         val ordenCreacion =
             """
-                CREATE TABLE COMPUTADOR(
+                CREATE TABLE COMPONENTE(
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    idComputador INTEGER,
                     nombre TEXT,
                     precio REAL,
-                    stock INTEGER,
+                    fecha TEXT,
                     marca TEXT,
                     nuevo INTEGER
                 )
@@ -27,24 +28,26 @@ class miSQLiteHelper(context: Context) : SQLiteOpenHelper(
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
     }
 
-    fun guardarComputador(
+    fun guardarComponente(
+        idComputador: Int,
         nombre:String,
         precio: Double,
-        stock:Int,
+        fecha:String,
         marca:String,
         nuevo: Int
     ):Boolean{
         val basedatosEscritura = writableDatabase
         val valoresAGuardar = ContentValues()
+        valoresAGuardar.put("idComputador",idComputador)
         valoresAGuardar.put("nombre",nombre)
         valoresAGuardar.put("precio",precio)
-        valoresAGuardar.put("stock",stock)
+        valoresAGuardar.put("fecha",fecha)
         valoresAGuardar.put("marca",marca)
         valoresAGuardar.put("nuevo",nuevo)
 
         val resultadoGuardar = basedatosEscritura
             .insert(
-                "COMPUTADOR", // Tabla
+                "COMPONENTE", // Tabla
                 null, //
                 valoresAGuardar // valores
             )
@@ -52,37 +55,40 @@ class miSQLiteHelper(context: Context) : SQLiteOpenHelper(
         return  if(resultadoGuardar.toInt() == -1) false else true
     }
 
-    fun consultarComputadoras():ArrayList<Computador>{
+    fun consultarComponentes(idComputador:Int):ArrayList<Componente>{
         val baseDatosLectura = readableDatabase
-        val scriptConsultarUsuario = "SELECT * FROM  COMPUTADOR"
+        val scriptConsultarUsuario = "SELECT * FROM  COMPONENTE WHERE idComputador = ?"
         val resultadoConsultaLectura = baseDatosLectura.rawQuery(
             scriptConsultarUsuario,
-            arrayOf()
+            arrayOf(
+                idComputador.toString()
+            )
         )
-        val existeComputador = resultadoConsultaLectura.moveToFirst()
-        val listaComputadores = arrayListOf<Computador>()
-        if(existeComputador){
+        val existeComponentes = resultadoConsultaLectura.moveToFirst()
+        val listaComponentes = arrayListOf<Componente>()
+        if(existeComponentes){
             do{
-                listaComputadores
-                    .add(Computador(resultadoConsultaLectura.getInt(0),
-                        resultadoConsultaLectura.getString(1),
-                        resultadoConsultaLectura.getDouble(2),
-                        resultadoConsultaLectura.getInt(3),
-                        resultadoConsultaLectura.getString(4),
-                        resultadoConsultaLectura.getInt(5)
-                    ))
+                listaComponentes
+                    .add(
+                        Componente(resultadoConsultaLectura.getInt(0),
+                            resultadoConsultaLectura.getInt(1),
+                            resultadoConsultaLectura.getString(2),
+                            resultadoConsultaLectura.getDouble(3),
+                            resultadoConsultaLectura.getString(4),
+                            resultadoConsultaLectura.getString(5),
+                            resultadoConsultaLectura.getInt(6)
+                        ))
             }while (resultadoConsultaLectura.moveToNext())
         }
-
         resultadoConsultaLectura.close()
         baseDatosLectura.close()
-        return listaComputadores
+        return listaComponentes
     }
 
-    fun actualizarComputador(
+    fun actualizarComponente(
         nombre:String,
         precio: Double,
-        stock:Int,
+        fecha:String,
         marca:String,
         nuevo: Int,
         idActualizar:Int
@@ -91,12 +97,12 @@ class miSQLiteHelper(context: Context) : SQLiteOpenHelper(
         val valoresAActualizar = ContentValues()
         valoresAActualizar.put("nombre",nombre)
         valoresAActualizar.put("precio",precio)
-        valoresAActualizar.put("stock",stock)
+        valoresAActualizar.put("fecha",fecha)
         valoresAActualizar.put("marca",marca)
         valoresAActualizar.put("nuevo",nuevo)
         val resultadoActualizacion = conexionEscritura
             .update(
-                "COMPUTADOR", //  tabla
+                "COMPONENTE", //  tabla
                 valoresAActualizar, // valores a actualizar
                 "id=?", //clausula where
                 arrayOf(
@@ -107,9 +113,9 @@ class miSQLiteHelper(context: Context) : SQLiteOpenHelper(
         return if (resultadoActualizacion == -1) false else true
     }
 
-    fun consultarComputadoraPorId(id:Int):Computador{
+    fun consultarComponentePorId(id:Int):Componente{
         val baseDatosLectura = readableDatabase
-        val scriptConsultarUsuario = "SELECT * FROM COMPUTADOR WHERE ID = ?"
+        val scriptConsultarUsuario = "SELECT * FROM COMPONENTE WHERE ID = ?"
         val resultadoConsultaLectura = baseDatosLectura.rawQuery(
             scriptConsultarUsuario,
             arrayOf(
@@ -117,35 +123,36 @@ class miSQLiteHelper(context: Context) : SQLiteOpenHelper(
             )
         )
         val existeComputador = resultadoConsultaLectura.moveToFirst()
-        val computadorEncontrado = Computador(0,"",0.0,0,"",0)
+        val componenteEncontrado = Componente(0,0,"",0.0,"","",0)
         //Logica obtener usuario
         do{
             val id = resultadoConsultaLectura.getInt(0)
-            val nombre = resultadoConsultaLectura.getString(1)
-            val precio = resultadoConsultaLectura.getDouble(2)
-            val stock = resultadoConsultaLectura.getInt(3)
-            val marca = resultadoConsultaLectura.getString(4)
-            val nuevo = resultadoConsultaLectura.getInt(5)
+            val idComputador = resultadoConsultaLectura.getInt(1)
+            val nombre = resultadoConsultaLectura.getString(2)
+            val precio = resultadoConsultaLectura.getDouble(3)
+            val fecha = resultadoConsultaLectura.getString(4)
+            val marca = resultadoConsultaLectura.getString(5)
+            val nuevo = resultadoConsultaLectura.getInt(6)
 
             if(id != null){
-                computadorEncontrado.id=id
-                computadorEncontrado.nombre= nombre
-                computadorEncontrado.precio = precio
-                computadorEncontrado.stock = stock
-                computadorEncontrado.marca = marca
-                computadorEncontrado.nuevo = nuevo
+                componenteEncontrado.id=id
+                componenteEncontrado.nombre= nombre
+                componenteEncontrado.precio = precio
+                componenteEncontrado.fechaFabricacion = fecha
+                componenteEncontrado.marca = marca
+                componenteEncontrado.nuevo = nuevo
             }
         }while (resultadoConsultaLectura.moveToNext())
         resultadoConsultaLectura.close()
         baseDatosLectura.close()
-        return computadorEncontrado
+        return componenteEncontrado
     }
 
-    fun eliminarComputador(id:Int):Boolean{
+    fun eliminarComponente(id:Int):Boolean{
         val conexionEscritura = writableDatabase
         val resultadoEliminado = conexionEscritura
             .delete(
-                "COMPUTADOR", //tabla
+                "COMPONENTE", //tabla
                 "id=?", // id=? and nombre=? Where (podemos amdnar parametros en orden)
                 arrayOf(
                     id.toString()

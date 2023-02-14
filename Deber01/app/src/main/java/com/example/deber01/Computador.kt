@@ -7,7 +7,6 @@ class Computador(
     var stock: Int,
     var marca:String,
     var nuevo:Int
-
 ) {
     override fun toString(): String {
         return "Nombre: ${nombre}\n" +

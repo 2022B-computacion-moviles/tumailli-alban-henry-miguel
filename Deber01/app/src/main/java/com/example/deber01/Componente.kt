@@ -1,11 +1,13 @@
 package com.example.deber01
 
 class Componente(
+    var id:Int,
+    var idComputador: Int,
     var nombre:String,
-    var precio:Float,
+    var precio:Double,
     var fechaFabricacion: String,
     var marca:String,
-    var nuevo:Boolean
+    var nuevo:Int
 
 ) {
     override fun toString(): String {
