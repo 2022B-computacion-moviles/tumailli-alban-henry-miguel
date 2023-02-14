@@ -8,10 +8,7 @@ import android.os.Bundle
 import android.provider.ContactsContract
 import android.util.Log
 import android.widget.Button
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
-import org.jetbrains.annotations.Contract
-import kotlin.math.log
 
 
 class MainActivity : AppCompatActivity() {
@@ -88,6 +85,18 @@ class MainActivity : AppCompatActivity() {
         botonSQLite
             .setOnClickListener{
                 irActividad(ECrudEntrenador::class.java)
+            }
+
+        val botonRView = findViewById<Button>(R.id.btn_revcycler_view)
+        botonRView
+            .setOnClickListener{
+                irActividad(GRecyclerView::class.java)
+            }
+
+        val botonGmaps = findViewById<Button>(R.id.btn_google_maps)
+        botonGmaps
+            .setOnClickListener{
+                irActividad(HGoogleMaps::class.java)
             }
     }
 

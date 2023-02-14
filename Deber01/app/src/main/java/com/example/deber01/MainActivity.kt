@@ -1,4 +1,4 @@
-package com.example.examen_ib
+package com.example.deber01
 
 import android.app.Activity
 import android.content.DialogInterface
@@ -9,20 +9,16 @@ import android.util.Log
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
-import android.widget.AdapterView
-import android.widget.Button
-import android.widget.ListView
+import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
-import org.json.JSONArray
-import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.snackbar.Snackbar
-recycler_view_vistarecycler_view_vista
+import org.json.JSONArray
 
 class MainActivity : AppCompatActivity() {
 
-    var jsonArray: JSONArray  = JSONArray()
-    val computadoras: ArrayList<Computador> = arrayListOf<Computador>()
+    lateinit var computadorDBHelper:miSQLiteHelper
+    var computadoras: ArrayList<Computador> = arrayListOf<Computador>()
     var idItemSeleccionado = 0
 
     val contenidoIntenetExplicito=
@@ -39,16 +35,15 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        computadorDBHelper = miSQLiteHelper(this)
         val listView = findViewById<ListView>(R.id.lv_computadores)
 
-        leerFichero()
+        computadoras = computadorDBHelper.consultarComputadoras()
 
         val adaptador = ArrayAdapter(
             this,
             android.R.layout.simple_list_item_1,
             computadoras
-
         )
 
         listView.adapter = adaptador
@@ -58,7 +53,6 @@ class MainActivity : AppCompatActivity() {
         val botonAddComputador = findViewById<Button>(R.id.btn_add_computador)
         botonAddComputador
             .setOnClickListener{
-
                 abrirActividadConParametos(CrearComputador::class.java,-1)
             }
 
@@ -76,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         //Obtener el id del ArrayListSeleccionado
         val info = menuInfo as AdapterView.AdapterContextMenuInfo
         val id = info.position
-        idItemSeleccionado = id
+        idItemSeleccionado = id+1
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
@@ -94,7 +88,7 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.mi_componentes->{
                 "${idItemSeleccionado}"
-                abrirActividadConParametos(ListComponentes::class.java,idItemSeleccionado)
+                abrirActividadConParametos(ListaComponentes::class.java,idItemSeleccionado)
                 return true
             }
             else -> super.onContextItemSelected(item)
@@ -109,12 +103,9 @@ class MainActivity : AppCompatActivity() {
             DialogInterface.OnClickListener{
                     dialog,
                     which->
-                    val lector:LeerFichero = LeerFichero(applicationContext)
-                    jsonArray = JSONArray(lector.leer())
-                    jsonArray.remove(id)
-                    val escritor= GuardarFichero(applicationContext,jsonArray.toString())
-                    escritor.escribir()
-                    abrirActividad(MainActivity::class.java)
+                computadorDBHelper = miSQLiteHelper(this)
+                computadorDBHelper.eliminarComputador(idItemSeleccionado)
+                abrirActividad(MainActivity::class.java)
             }
         )
 
@@ -136,33 +127,10 @@ class MainActivity : AppCompatActivity() {
         contenidoIntenetExplicito.launch(intentExplicito)
     }
 
-    fun leerFichero(){
-        val lector:LeerFichero = LeerFichero(applicationContext)
-        jsonArray = JSONArray(lector.leer())
-        for(i in 0 until jsonArray.length()){
-            val jsonObject:JSONObject = jsonArray.getJSONObject(i)
-            computadoras.add(
-                Computador(
-                    jsonObject.getString("nombre"),
-                    jsonObject.getString("precio").toFloat(),
-                    jsonObject.getString("stock").toInt(),
-                    jsonObject.getString("marca"),
-                    jsonObject.getBoolean("nuevo")
-                )
-            )
-        }
-    }
-
     private fun abrirActividad(
         clase: Class<*>,
     ) {
         val i = Intent(this, clase)
         startActivity(i);
-    }
-
-    fun mostrarSnackBar(texto:String){
-        Snackbar.make(findViewById(R.id.ly_main),
-            texto, Snackbar.LENGTH_LONG)
-            .setAction("Action",null).show()
     }
 }
