@@ -1,11 +1,11 @@
 package com.example.proyecto_iib
 
 class Paciente (
-var cod_pais: String,
-var nombre_pais: String?,
-var capital_pais: String?,
-var cantidad_habitantes_pais: Int?,
-var tasa_mortalidad: Double?,
-var pais_capitalista: Int?
+var cod_paciente: String,
+var nombre_paciente: String?,
+var apellido_paciente: String?,
+var telefono_paciente: Int?,
+var correo_paciente: String?,
+var contraseña_paciente: String?
 )
 
