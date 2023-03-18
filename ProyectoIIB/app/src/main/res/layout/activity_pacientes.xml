@@ -26,7 +26,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_pacientes"
             android:layout_width="match_parent"
-            android:layout_height="541dp" />
+            android:layout_height="592dp" />
 
         <View
             android:id="@+id/divider2"
