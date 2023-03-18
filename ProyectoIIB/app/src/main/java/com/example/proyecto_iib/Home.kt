@@ -32,6 +32,11 @@ class Home : AppCompatActivity() {
             .setOnClickListener{
                 abrirActividad(Pacientes::class.java)
             }
+
+        perfil
+            .setOnClickListener{
+                abrirActividad(Perfil::class.java)
+            }
     }
 
     private fun abrirActividad(
