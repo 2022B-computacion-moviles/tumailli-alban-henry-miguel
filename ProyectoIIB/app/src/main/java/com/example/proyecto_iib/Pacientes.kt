@@ -1,58 +1,70 @@
 package com.example.proyecto_iib
 
-import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import android.widget.TextView
-import com.google.firebase.auth.FirebaseAuth
+import android.widget.ImageButton
+import androidx.recyclerview.widget.RecyclerView
 
 class Pacientes : AppCompatActivity() {
+    private var listaPacientes: ArrayList<Paciente> = arrayListOf()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pacientes)
 
-        val bundle=intent.extras
-        val nombre_Odo= bundle?.getString("nombre_us").toString()
-        val correo= bundle?.getString("correo").toString()
+        val agendar = findViewById<ImageButton>(R.id.btn_agendar)
+        val cancelar = findViewById<ImageButton>(R.id.btn_cancelar)
+        val home = findViewById<ImageButton>(R.id.btn_home)
+        val perfil = findViewById<ImageButton>(R.id.btn_perfil)
 
-        val msjBienvenida= findViewById<TextView>(R.id.msj_bienvenida_odo)
-        msjBienvenida.text="Bienvenido, ${nombre_Odo}"
+        listaPacientes.add(Paciente("Henry Tumailli","02/02/2023"))
+        listaPacientes.add(Paciente("Henry Tumailli","02/02/2023"))
+        listaPacientes.add(Paciente("Henry Tumaill","02/02/2023"))
 
-        //Guardado de Datos
+        val recyclerView = findViewById<RecyclerView>(R.id.rv_pacientes)
+        inicializarRecyclerView(listaPacientes,recyclerView)
 
-        val prefs=getSharedPreferences(getString(R.string.prefs_file),Context.MODE_PRIVATE).edit()
-        prefs.putString("correo",correo)
-        prefs.putString("nombre",nombre_Odo)
-        prefs.apply()
+        agendar
+            .setOnClickListener{
+                abrirActividad(Agendar::class.java)
+            }
 
-        //logaut
-        val btn_logaut=findViewById<Button>(R.id.logaut_odo)
-        btn_logaut.setOnClickListener{
+        cancelar
+            .setOnClickListener{
+                abrirActividad(Cancelar::class.java)
+            }
 
-            val prefs = getSharedPreferences(getString(R.string.prefs_file), Context.MODE_PRIVATE)
-            val editor =prefs.edit()
-            editor.clear()
-            editor.apply()
+        home
+            .setOnClickListener{
+                abrirActividad(Home::class.java)
+            }
 
-            FirebaseAuth.getInstance().signOut()
-            onBackPressed()
-
-            irActividad(MainActivity::class.java)
-
-        }
+        perfil
+            .setOnClickListener{
+                abrirActividad(Perfil::class.java)
+            }
     }
 
-    override fun onBackPressed() {
-        // Dejar vacío para deshabilitar el botón de retroceso
+    fun inicializarRecyclerView(
+        lista:ArrayList<Paciente>,
+        recyclerView: RecyclerView
+    ){
+        val adaptador = RecyclerPacientes(
+            this,
+            lista
+        )
+        recyclerView.adapter = adaptador
+        recyclerView.itemAnimator = androidx.recyclerview.widget.DefaultItemAnimator()
+        recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+        adaptador.notifyDataSetChanged()
     }
 
-    fun irActividad(
-        clase: Class<*>
+    private fun abrirActividad(
+        clase: Class<*>,
     ) {
-        val intent = Intent(this, clase)
-        startActivity(intent)
-
+        val i = Intent(this, clase)
+        startActivity(i);
     }
+
 }

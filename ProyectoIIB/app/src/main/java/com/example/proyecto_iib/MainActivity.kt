@@ -88,5 +88,17 @@ class MainActivity : AppCompatActivity() {
         usuario.putExtra("nombre_us", nombre)
         usuario.putExtra("correo",correo)
         startActivity(usuario)
+
+        //abrirActividad(Home::class.java)
+
     }
+
+
+    private fun abrirActividad(
+        clase: Class<*>,
+    ) {
+        val i = Intent(this, clase)
+        startActivity(i);
+    }
+
 }
