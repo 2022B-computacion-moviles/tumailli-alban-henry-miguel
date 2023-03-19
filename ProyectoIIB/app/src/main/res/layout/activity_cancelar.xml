@@ -28,14 +28,14 @@
             android:id="@+id/textView9"
             android:layout_width="match_parent"
             android:layout_height="30dp"
-            android:text="Selecciona la fecha"
+            android:text="Selecciona la cita"
             android:textSize="15dp"
             android:textStyle="bold" />
 
-        <CalendarView
-            android:id="@+id/calendarView"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_cancelar_cita"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="306dp" />
 
         <TextView
             android:id="@+id/textView11"
@@ -47,7 +47,7 @@
             android:textStyle="bold" />
 
         <Button
-            android:id="@+id/btn_cerrar_sesion"
+            android:id="@+id/btn_agendar_c"
             android:layout_width="100dp"
             android:layout_height="40dp"
             android:layout_gravity="center"
