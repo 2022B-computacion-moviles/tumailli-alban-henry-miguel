@@ -51,7 +51,7 @@ class Inicio_Sesion : AppCompatActivity() {
                                             abrirInicio(
                                                 Home::class.java,
                                                 document.id,
-                                                "pacientes",
+                                                "odontologos",
                                                 document.data?.get("nombre").toString())
                                         }
                                     }

@@ -27,7 +27,7 @@
             android:id="@+id/textView2"
             android:layout_width="match_parent"
             android:layout_height="51dp"
-            android:text="Tus citas de hoy"
+            android:text="Tus citas"
             android:textSize="20dp"
             android:textStyle="bold" />
 
