@@ -1,5 +1,6 @@
 package com.example.proyecto_iib
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -16,15 +17,14 @@ class Home : AppCompatActivity() {
     var citas: ArrayList<Cita> = arrayListOf<Cita>()
     val db: FirebaseFirestore = Firebase.firestore
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        val idPaciente = "MlSJXSSTF0iAVtiigSdE"
-        val idOdontologo = "MlSJXSSTF0iAVtiigSdE"
-
-        /*val idPaciente =intent.getStringExtra("idPaciente")
-        val idOdontologo =intent.getStringExtra("idOdontologo")*/
+        val idUsuario =intent.getStringExtra("id")
+        val tipo =intent.getStringExtra("tipo")
+        val nombre =intent.getStringExtra("nombre")
 
         val agendar = findViewById<ImageButton>(R.id.btn_agendar)
         val cancelar = findViewById<ImageButton>(R.id.btn_cancelar)
@@ -32,94 +32,85 @@ class Home : AppCompatActivity() {
         val perfil = findViewById<ImageButton>(R.id.btn_perfil)
         val recyclerView = findViewById<RecyclerView>(R.id.rv_home)
         val sin_cita = findViewById<TextView>(R.id.sin_cita)
+        val tv_nombre = findViewById<TextView>(R.id.tv_nombre)
+
+        tv_nombre.setText("Bienvenido, "+nombre)
 
         //Conusltad de Citas paciente
 
-        if(idPaciente != null){
-            db.collection("citas")
-                .whereEqualTo("idPaciente",idPaciente)
-                .get()
-                .addOnSuccessListener{ resultado ->
-                    for ( cita  in resultado){
-                        var nombreProd="Procedimiento"
-                        db.collection("procedimientos")
-                            .document(cita["idProcedimiento"].toString())
-                            .get()
-                            .addOnSuccessListener { doc ->
-                                if(doc != null){
-                                    citas.add(
-                                        Cita(
-                                            cita["idPaciente"].toString(),
-                                            cita["idOdontologo"].toString(),
-                                            cita["idProcedimiento"].toString(),
-                                            doc["nombre"].toString(),
-                                            cita["hora"].toString(),
-                                            cita["fecha"].toString(),
-                                        )
+        db.collection("citas")
+            .whereEqualTo("idPaciente",idUsuario)
+            .get()
+            .addOnSuccessListener{ resultado ->
+                for ( cita  in resultado){
+                    var nombreProd="Procedimiento"
+                    db.collection("procedimientos")
+                        .document(cita["idProcedimiento"].toString())
+                        .get()
+                        .addOnSuccessListener { doc ->
+                            if(doc != null){
+                                citas.add(
+                                    Cita(
+                                        cita["idPaciente"].toString(),
+                                        cita["idOdontologo"].toString(),
+                                        cita["idProcedimiento"].toString(),
+                                        doc["nombre"].toString(),
+                                        cita["hora"].toString(),
+                                        cita["fecha"].toString(),
                                     )
-                                }
-                                inicializarRecyclerView(citas,recyclerView)
+                                )
                             }
-                    }
+                            inicializarRecyclerView(citas,recyclerView)
+                        }
                 }
-        }
+            }
 
         //Conusltad de Citas odontologo
-
-        if(idOdontologo != null){
-            db.collection("citas")
-                .whereEqualTo("idOdontologo",idOdontologo)
-                .get()
-                .addOnSuccessListener{ resultado ->
-                    for ( cita  in resultado){
-                        var nombreProd="Procedimiento"
-                        db.collection("procedimientos")
-                            .document(cita["idProcedimiento"].toString())
-                            .get()
-                            .addOnSuccessListener { doc ->
-                                if(doc != null){
-                                    citas.add(
-                                        Cita(
-                                            cita["idPaciente"].toString(),
-                                            cita["idOdontologo"].toString(),
-                                            cita["idProcedimiento"].toString(),
-                                            doc["nombre"].toString(),
-                                            cita["hora"].toString(),
-                                            cita["fecha"].toString(),
-                                        )
+        db.collection("citas")
+            .whereEqualTo("idOdontologo",idUsuario)
+            .get()
+            .addOnSuccessListener{ resultado ->
+                for ( cita  in resultado){
+                    var nombreProd="Procedimiento"
+                    db.collection("procedimientos")
+                        .document(cita["idProcedimiento"].toString())
+                        .get()
+                        .addOnSuccessListener { doc ->
+                            if(doc != null){
+                                citas.add(
+                                    Cita(
+                                        cita["idPaciente"].toString(),
+                                        cita["idOdontologo"].toString(),
+                                        cita["idProcedimiento"].toString(),
+                                        doc["nombre"].toString(),
+                                        cita["hora"].toString(),
+                                        cita["fecha"].toString(),
                                     )
-                                }
-                                inicializarRecyclerView(citas,recyclerView)
+                                )
                             }
-                    }
+                            inicializarRecyclerView(citas,recyclerView)
+                        }
                 }
-        }
-
-
-        //////////POSIBLE
-        /*if(citas.size == 0)
-            sin_cita.setText("No tiene citas programadas")*/
-
-
+            }
 
         agendar
             .setOnClickListener{
-                abrirActividad(Agendar::class.java)
+                abrirActividad(Agendar::class.java,idUsuario.toString(),tipo.toString())
             }
 
         cancelar
             .setOnClickListener{
-                abrirActividad(Cancelar::class.java)
+                abrirActividad(Cancelar::class.java,idUsuario.toString(),tipo.toString())
             }
 
         pacientes
             .setOnClickListener{
-                abrirActividad(Pacientes::class.java)
+                abrirActividad(Pacientes::class.java,idUsuario.toString(),tipo.toString())
             }
 
         perfil
             .setOnClickListener{
-                abrirActividad(Perfil::class.java)
+                abrirActividad(Perfil::class.java,idUsuario.toString(),tipo.toString())
             }
     }
 
@@ -139,9 +130,14 @@ class Home : AppCompatActivity() {
 
     private fun abrirActividad(
         clase: Class<*>,
+        id: String,
+        tipo:String,
     ) {
         val i = Intent(this, clase)
+        i.putExtra("id", id)
+        i.putExtra("tipo",tipo)
         startActivity(i);
     }
+
 }
 

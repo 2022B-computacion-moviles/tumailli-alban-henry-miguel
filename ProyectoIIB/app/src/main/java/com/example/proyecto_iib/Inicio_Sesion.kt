@@ -22,10 +22,6 @@ class Inicio_Sesion : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_inicio_sesion)
 
-
-
-
-
         val ir_registro= findViewById<TextView>(R.id.text_ir_registrarse2)
         ir_registro.setOnClickListener {
 
@@ -52,23 +48,25 @@ class Inicio_Sesion : AppCompatActivity() {
                                         if (correo.text.toString() == document.data?.get("correo")
                                                 .toString()
                                         ){
-                                            nombreUsuarioLogueado(Pacientes::class.java, document.data?.get("nombre").toString()
-                                                ,document.data?.get("correo").toString())
+                                            abrirInicio(
+                                                Home::class.java,
+                                                document.id,
+                                                "pacientes",
+                                                document.data?.get("nombre").toString())
                                         }
-
                                     }
                                 }
 
-                            db.collection("pacientes").get()
+                            db.collection("pacientes")
+                                .whereEqualTo("correo",correo.text.toString())
+                                .get()
                                 .addOnSuccessListener { result ->
-                                    for (document in result) {
-                                        if (correo.text.toString() == document.data?.get("correo")
-                                                .toString()
-                                        ){
-                                            nombreUsuarioLogueado(Calendario_Citas::class.java, document.data?.get("nombre").toString()
-                                            ,document.data?.get("correo").toString())
-                                        }
-
+                                    for (paciente in result){
+                                        abrirInicio(
+                                            Home::class.java,
+                                            paciente.id,
+                                            "pacientes",
+                                            paciente["nombre"].toString())
                                     }
                                 }
 
@@ -101,14 +99,16 @@ class Inicio_Sesion : AppCompatActivity() {
 
 
 
-    fun nombreUsuarioLogueado(
+    fun abrirInicio(
         clase: Class<*>,
-        nombre: String,
-        correo:String
+        id: String,
+        tipo:String,
+        nombre:String
     ) {
         val usuario = Intent(this, clase)
-        usuario.putExtra("nombre_us", nombre)
-        usuario.putExtra("correo",correo)
+        usuario.putExtra("id", id)
+        usuario.putExtra("tipo",tipo)
+        usuario.putExtra("nombre",nombre)
         startActivity(usuario)
     }
 
@@ -151,10 +151,4 @@ class Inicio_Sesion : AppCompatActivity() {
 
 
     }
-
-
-
-
-
-
 }
