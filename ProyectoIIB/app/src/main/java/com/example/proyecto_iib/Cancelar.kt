@@ -27,7 +27,9 @@ class Cancelar : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cancelar)
 
-        val idPaciente = "MlSJXSSTF0iAVtiigSdE"
+        val idUsuario =intent.getStringExtra("id")
+        val tipo =intent.getStringExtra("tipo")
+        val nombre =intent.getStringExtra("nombre")
 
         val home = findViewById<ImageButton>(R.id.btn_home)
         val agendar = findViewById<ImageButton>(R.id.btn_agendar)
@@ -38,34 +40,32 @@ class Cancelar : AppCompatActivity() {
 
         //Conusltad de Citas paciente
 
-        if(idPaciente != null){
-            db.collection("citas")
-                .whereEqualTo("idPaciente",idPaciente)
-                .get()
-                .addOnSuccessListener{ resultado ->
-                    for ( cita  in resultado){
-                        var nombreProd="Procedimiento"
-                        db.collection("procedimientos")
-                            .document(cita["idProcedimiento"].toString())
-                            .get()
-                            .addOnSuccessListener { doc ->
-                                if(doc != null){
-                                    citas.add(
-                                        Cita(
-                                            cita["idPaciente"].toString(),
-                                            cita["idOdontologo"].toString(),
-                                            cita["idProcedimiento"].toString(),
-                                            doc["nombre"].toString(),
-                                            cita["hora"].toString(),
-                                            cita["fecha"].toString(),
-                                        )
+        db.collection("citas")
+            .whereEqualTo("idPaciente",idUsuario)
+            .get()
+            .addOnSuccessListener{ resultado ->
+                for ( cita  in resultado){
+                    var nombreProd="Procedimiento"
+                    db.collection("procedimientos")
+                        .document(cita["idProcedimiento"].toString())
+                        .get()
+                        .addOnSuccessListener { doc ->
+                            if(doc != null){
+                                citas.add(
+                                    Cita(
+                                        cita["idPaciente"].toString(),
+                                        cita["idOdontologo"].toString(),
+                                        cita["idProcedimiento"].toString(),
+                                        doc["nombre"].toString(),
+                                        cita["hora"].toString(),
+                                        cita["fecha"].toString(),
                                     )
-                                }
-                                inicializarRecyclerView(citas,recyclerView)
+                                )
                             }
-                    }
+                            inicializarRecyclerView(citas,recyclerView)
+                        }
                 }
-        }
+            }
 
         agendar
             .setOnClickListener{

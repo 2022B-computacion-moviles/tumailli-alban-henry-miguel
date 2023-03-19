@@ -34,6 +34,7 @@ class Home : AppCompatActivity() {
         val sin_cita = findViewById<TextView>(R.id.sin_cita)
         val tv_nombre = findViewById<TextView>(R.id.tv_nombre)
 
+
         tv_nombre.setText("Bienvenido, "+nombre)
 
         //Conusltad de Citas paciente
@@ -93,24 +94,28 @@ class Home : AppCompatActivity() {
                 }
             }
 
-        agendar
-            .setOnClickListener{
-                abrirActividad(Agendar::class.java,idUsuario.toString(),tipo.toString())
-            }
 
-        cancelar
-            .setOnClickListener{
-                abrirActividad(Cancelar::class.java,idUsuario.toString(),tipo.toString())
-            }
+        if(tipo == "pacientes"){
+            agendar
+                .setOnClickListener{
+                    abrirActividad(Agendar::class.java,idUsuario.toString(),tipo.toString(),nombre.toString())
+                }
 
-        pacientes
-            .setOnClickListener{
-                abrirActividad(Pacientes::class.java,idUsuario.toString(),tipo.toString())
-            }
+            cancelar
+                .setOnClickListener{
+                    abrirActividad(Cancelar::class.java,idUsuario.toString(),tipo.toString(),nombre.toString())
+                }
+
+        }else{
+            pacientes
+                .setOnClickListener{
+                    abrirActividad(Pacientes::class.java,idUsuario.toString(),tipo.toString(),nombre.toString())
+                }
+        }
 
         perfil
             .setOnClickListener{
-                abrirActividad(Perfil::class.java,idUsuario.toString(),tipo.toString())
+                abrirActividad(Perfil::class.java,idUsuario.toString(),tipo.toString(),nombre.toString())
             }
     }
 
@@ -132,10 +137,12 @@ class Home : AppCompatActivity() {
         clase: Class<*>,
         id: String,
         tipo:String,
+        nombre:String
     ) {
         val i = Intent(this, clase)
         i.putExtra("id", id)
         i.putExtra("tipo",tipo)
+        i.putExtra("nombre",nombre)
         startActivity(i);
     }
 

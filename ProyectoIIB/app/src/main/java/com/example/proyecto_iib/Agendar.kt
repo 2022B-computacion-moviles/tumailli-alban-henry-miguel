@@ -43,24 +43,30 @@ class Agendar : AppCompatActivity() {
         val selec_hora = findViewById<Button>(R.id.btn_selec_hora)
         val et_hora = findViewById<EditText>(R.id.tf_hora)
 
+        val idUsuario =intent.getStringExtra("id")
+        val tipo =intent.getStringExtra("tipo")
+        val nombre =intent.getStringExtra("nombre")
+        idPaciente = idUsuario.toString()
+
+
         home
             .setOnClickListener{
-                abrirActividad(Home::class.java)
+                abrirActividad(Home::class.java,idUsuario.toString(),tipo.toString(),nombre.toString())
             }
 
         cancelar
             .setOnClickListener{
-                abrirActividad(Cancelar::class.java)
+                abrirActividad(Cancelar::class.java,idUsuario.toString(),tipo.toString(),nombre.toString())
             }
 
         pacientes
             .setOnClickListener{
-                abrirActividad(Pacientes::class.java)
+                abrirActividad(Pacientes::class.java,idUsuario.toString(),tipo.toString(),nombre.toString())
             }
 
         perfil
             .setOnClickListener{
-                abrirActividad(Perfil::class.java)
+                abrirActividad(Perfil::class.java,idUsuario.toString(),tipo.toString(),nombre.toString())
             }
 
         val especialidades = arrayListOf<String>()
@@ -84,8 +90,6 @@ class Agendar : AppCompatActivity() {
             val itemSelected = adapterView.getItemAtPosition(i)
             var idEspecialidad = -1
             val procedimientos = arrayListOf<String>()
-            val hora_inicio = ""
-            val hora_fin = ""
 
             db.collection("especialidades")
                 .whereEqualTo("nombre",itemSelected.toString())
@@ -131,7 +135,6 @@ class Agendar : AppCompatActivity() {
                                 for (proc in res) {
                                     idProcedimiento = proc.id
                                 }
-                                Log.i("Id Prod",idProcedimiento+" ODon "+idOdontologo+" fecha"+fechaCita+"Hora"+horaCita)
                             }
                     }
 
@@ -181,14 +184,51 @@ class Agendar : AppCompatActivity() {
 
         //GUARDAR
         agendar_cita.setOnClickListener {
+            if(tipo == "pacientes"){
+                if(idOdontologo != "" && idProcedimiento != "" && fechaCita != "" && horaCita != ""){
+                    val dato = hashMapOf(
+                        "fecha" to fechaCita,
+                        "hora" to horaCita,
+                        "idOdontologo" to idOdontologo,
+                        "idPaciente" to idPaciente,
+                        "idProcedimiento" to idProcedimiento
+                    )
 
+                    db.collection("citas")
+                        .add(dato)
+                        .addOnSuccessListener {
+                            Toast.makeText(this,
+                                "Cita registrada con éxito",
+                                Toast.LENGTH_LONG
+                            ).show()
+
+                            abrirActividad(Home::class.java,idUsuario.toString(),tipo.toString(),nombre.toString())
+                        }
+                }else
+                    Toast.makeText(this,
+                        "Llene todos los campos",
+                        Toast.LENGTH_LONG
+                    ).show()
+            }else{
+                Toast.makeText(this,
+                    "Solo los pacientes pueden agendar citas",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            Log.i("Id Prod",idProcedimiento+" ODon "+idOdontologo+" fecha"+fechaCita+"Hora"+horaCita+"User"+idUsuario)
         }
     }
 
     private fun abrirActividad(
         clase: Class<*>,
+        id: String,
+        tipo:String,
+        nombre:String
     ) {
         val i = Intent(this, clase)
+        i.putExtra("id", id)
+        i.putExtra("tipo",tipo)
+        i.putExtra("nombre",nombre)
         startActivity(i);
     }
 
