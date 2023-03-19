@@ -219,6 +219,11 @@ class Agendar : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        // Dejar vacío para deshabilitar el botón de retroceso
+    }
+
+
     private fun abrirActividad(
         clase: Class<*>,
         id: String,

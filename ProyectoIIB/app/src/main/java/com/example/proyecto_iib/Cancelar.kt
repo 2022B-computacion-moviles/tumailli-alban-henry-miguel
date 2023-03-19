@@ -78,7 +78,7 @@ class Cancelar : AppCompatActivity(),RecyclerCancelarCita.OnCitaClickListener {
             DialogInterface.OnClickListener{
                     dialog,
                     which->
-                val recyclerView = findViewById<RecyclerView>(R.id.rv_cancelar_cita)
+
                 db.collection("citas")
                     .whereEqualTo("idPaciente",idPaciente)
                     .whereEqualTo("fecha",fecha)
@@ -147,6 +147,11 @@ class Cancelar : AppCompatActivity(),RecyclerCancelarCita.OnCitaClickListener {
         recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         adaptador.notifyDataSetChanged()
     }
+
+    override fun onBackPressed() {
+        // Dejar vacío para deshabilitar el botón de retroceso
+    }
+
 
     private fun abrirActividad(
         clase: Class<*>,

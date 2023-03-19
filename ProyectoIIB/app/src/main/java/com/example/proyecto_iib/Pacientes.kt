@@ -86,6 +86,11 @@ class Pacientes : AppCompatActivity() {
         adaptador.notifyDataSetChanged()
     }
 
+
+    override fun onBackPressed() {
+        // Dejar vacío para deshabilitar el botón de retroceso
+    }
+
     private fun abrirActividad(
         clase: Class<*>,
         id: String,
