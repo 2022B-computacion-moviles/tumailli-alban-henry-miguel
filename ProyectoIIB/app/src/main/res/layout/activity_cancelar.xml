@@ -35,12 +35,12 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_cancelar_cita"
             android:layout_width="match_parent"
-            android:layout_height="306dp" />
+            android:layout_height="346dp" />
 
         <TextView
             android:id="@+id/textView11"
             android:layout_width="349dp"
-            android:layout_height="161dp"
+            android:layout_height="101dp"
             android:layout_gravity="center"
             android:text="NOTA: Solo podrá cancelar citas con un mínimo de 24 horas de anticipación. "
             android:textSize="15dp"
