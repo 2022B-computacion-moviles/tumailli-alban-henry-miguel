@@ -5,31 +5,30 @@ import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.ContextMenu
-import android.view.MenuItem
-import android.view.View
-import android.widget.AdapterView
 import android.widget.ImageButton
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-class Cancelar : AppCompatActivity() {
+class Cancelar : AppCompatActivity(),RecyclerCancelarCita.OnCitaClickListener {
     var citas: ArrayList<Cita> = arrayListOf<Cita>()
     val db: FirebaseFirestore = Firebase.firestore
-    var idItemSeleccionado = 0
+    var idUser = ""
+    var type = ""
+    var name = ""
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cancelar)
 
         val idUsuario =intent.getStringExtra("id")
+        idUser = idUsuario.toString()
         val tipo =intent.getStringExtra("tipo")
         val nombre =intent.getStringExtra("nombre")
+        type = tipo.toString()
+        name = nombre.toString()
 
         val home = findViewById<ImageButton>(R.id.btn_home)
         val agendar = findViewById<ImageButton>(R.id.btn_agendar)
@@ -38,8 +37,74 @@ class Cancelar : AppCompatActivity() {
         val perfil = findViewById<ImageButton>(R.id.btn_perfil)
         val recyclerView = findViewById<RecyclerView>(R.id.rv_cancelar_cita)
 
-        //Conusltad de Citas paciente
+        consultar(idUsuario.toString(),recyclerView)
 
+        if(tipo == "pacientes"){
+            agendar
+                .setOnClickListener{
+                    abrirActividad(Agendar::class.java,idUsuario.toString(),tipo.toString(),nombre.toString())
+                }
+
+            home
+                .setOnClickListener{
+                    abrirActividad(Home::class.java,idUsuario.toString(),tipo.toString(),nombre.toString())
+                }
+
+        }
+
+        perfil
+            .setOnClickListener{
+                abrirActividad(Perfil::class.java,idUsuario.toString(),tipo.toString(),nombre.toString())
+            }
+
+    }
+
+    override fun onItemClick(idPaciente: String, fecha: String, hora: String) {
+        abrirDialogo(idPaciente,fecha,hora,type,name)
+    }
+
+
+    fun abrirDialogo(
+        idPaciente: String,
+        fecha: String,
+        hora: String,
+        tipo:String,
+        nombre:String
+    ){
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("¿Está seguro que quiere eliminar este elemento?")
+        builder.setPositiveButton(
+            "Aceptar",
+            DialogInterface.OnClickListener{
+                    dialog,
+                    which->
+                val recyclerView = findViewById<RecyclerView>(R.id.rv_cancelar_cita)
+                db.collection("citas")
+                    .whereEqualTo("idPaciente",idPaciente)
+                    .whereEqualTo("fecha",fecha)
+                    .whereEqualTo("hora",hora)
+                    .get()
+                    .addOnSuccessListener { res ->
+                        for(cita in res)
+                        db.collection("citas")
+                            .document(cita.id)
+                            .delete()
+                    }
+                abrirActividad(Cancelar::class.java,idUser,tipo,nombre)
+            }
+        )
+
+        builder.setNegativeButton(
+            "Cancelar",
+            null
+        )
+
+        val dialogo = builder.create()
+        dialogo.show()
+    }
+
+
+    private fun consultar(idUsuario:String,recyclerView: RecyclerView){
         db.collection("citas")
             .whereEqualTo("idPaciente",idUsuario)
             .get()
@@ -66,87 +131,16 @@ class Cancelar : AppCompatActivity() {
                         }
                 }
             }
-
-        agendar
-            .setOnClickListener{
-                abrirActividad(Agendar::class.java)
-            }
-
-        home
-            .setOnClickListener{
-                abrirActividad(Home::class.java)
-            }
-
-        pacientes
-            .setOnClickListener{
-                abrirActividad(Pacientes::class.java)
-            }
-
-        perfil
-            .setOnClickListener{
-                abrirActividad(Perfil::class.java)
-            }
     }
-
-    override fun onCreateContextMenu(
-        menu: ContextMenu?,
-        v: View?,
-        menuInfo: ContextMenu.ContextMenuInfo?
-    ) {
-        super.onCreateContextMenu(menu, v, menuInfo)
-        //Lenamos las opciones del menu
-        val inflater = menuInflater
-        inflater.inflate(R.menu.cancelar_cita,menu)
-        //Obtener el id del ArrayListSeleccionado
-        val info = menuInfo as AdapterView.AdapterContextMenuInfo
-        val id = info.position
-        //idItemSeleccionado = componentes[id].id
-    }
-
-    override fun onContextItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId){
-            R.id.mi_eliminar->{
-                abrirDialogo(idItemSeleccionado)
-                "${idItemSeleccionado}"
-                return true
-            }
-            else -> super.onContextItemSelected(item)
-        }
-    }
-
-    fun abrirDialogo(id :Int){
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("¿Está seguro que quiere eliminar este elemento?")
-        builder.setPositiveButton(
-            "Aceptar",
-            DialogInterface.OnClickListener{
-                    dialog,
-                    which->
-                /*
-                db.collection("componentes")
-                    .document(idItemSeleccionado.toString())
-                    .delete()
-                abrirActividadConParametos(ListaComponentes::class.java,compuId)*/
-            }
-        )
-
-        builder.setNegativeButton(
-            "Cancelar",
-            null
-        )
-
-        val dialogo = builder.create()
-        dialogo.show()
-    }
-
 
     fun inicializarRecyclerView(
         lista:ArrayList<Cita>,
         recyclerView: RecyclerView
     ){
-        val adaptador = RecyclerCitas(
+        val adaptador = RecyclerCancelarCita(
             this,
-            lista
+            lista,
+            this
         )
         recyclerView.adapter = adaptador
         recyclerView.itemAnimator = androidx.recyclerview.widget.DefaultItemAnimator()
@@ -156,8 +150,14 @@ class Cancelar : AppCompatActivity() {
 
     private fun abrirActividad(
         clase: Class<*>,
+        id: String,
+        tipo:String,
+        nombre:String
     ) {
         val i = Intent(this, clase)
+        i.putExtra("id", id)
+        i.putExtra("tipo",tipo)
+        i.putExtra("nombre",nombre)
         startActivity(i);
     }
 
